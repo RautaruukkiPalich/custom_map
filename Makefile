@@ -7,3 +7,5 @@ lint:
 test:
 	go test -v -cover -race -timeout 30s ./...
 	
+bench:
+

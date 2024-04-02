@@ -1,5 +1,3 @@
-package custommap
-
 //TODO: create custom map
 //TODO: get/set funcs
 //TODO: concurrent map
