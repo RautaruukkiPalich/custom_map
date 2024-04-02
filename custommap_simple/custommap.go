@@ -1,45 +1,52 @@
 package custommap
 
+import (
+	"sync"
+)
+
 type MapInterface interface {
 	Set(string, any)        // set value into map
 	Get(string) (any, bool) // get value from map
 	Len() int               // length of map keys
 }
 
-func NewMap() MapInterface {
+func NewSimpleMap() MapInterface {
 	return &customMap{
 		length: 0,
-		salt:   0,
+		// salt:   0,
 
 		lenBuckets: 0,
-		buckets:    []*bucket{},
-		oldBuckets: []*bucket{},
+		buckets:    make([]*bucket, 0, 10),
+		// oldBuckets: []*bucket{},
 	}
 }
 
 // without memory alignment
 type customMap struct {
-	length uint
-	salt   uint32
+	length int
 
 	lenBuckets uint8
 	buckets    []*bucket
-	oldBuckets []*bucket
+
+	mu sync.RWMutex
 }
 
 func (m *customMap) Len() int {
-	return int(m.length)
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	return m.length
 }
 
 func (m *customMap) Set(key string, value any) {
+
 	// create hashKey for the key
 	hashedKey := m.hashKey(key)
 
 	// looking for bucket
-	bucketIdx := m.getIdxOrCreateBucketFromHash(hashedKey)
+	bucket := m.getBucketByHash(hashedKey)
 
 	// if key is not unique save val to bucket
-	_, ok := m.getValueFromBucketByBucketIdx(key, bucketIdx)
+	_, ok := m.getValueFromBucket(key, bucket)
 
 	// if key is unique -> increase counter
 	if !ok {
@@ -47,7 +54,7 @@ func (m *customMap) Set(key string, value any) {
 	}
 
 	// save key and value to bucket
-	m.setValueToBucketByIdx(key, value, bucketIdx)
+	m.setValueToBucket(key, value, bucket)
 }
 
 func (m *customMap) Get(key string) (any, bool) {
@@ -55,7 +62,7 @@ func (m *customMap) Get(key string) (any, bool) {
 	hashedKey := m.hashKey(key)
 
 	// looking for bucket
-	bucketIdx := m.getIdxOrCreateBucketFromHash(hashedKey)
+	bucket := m.getBucketByHash(hashedKey)
 
-	return m.getValueFromBucketByBucketIdx(key, bucketIdx)
+	return m.getValueFromBucket(key, bucket)
 }

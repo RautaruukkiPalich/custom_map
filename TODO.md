@@ -1,6 +1,4 @@
-//TODO: create custom map
-//TODO: get/set funcs
+//TODO: evacuate
 //TODO: concurrent map
-//TODO: custom hash function
 //TODO: tests
 //TODO: banchmarks
