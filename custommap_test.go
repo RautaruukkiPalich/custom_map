@@ -1,20 +1,17 @@
 package custommap
 
 import (
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateMap(t *testing.T) {
-	log.Println("test: TestCreateMap")
 	m := NewMap()
 	assert.NotNil(t, m)
 }
 
 func TestSetElems(t *testing.T) {
-	log.Println("test: TestAddElems")
 	m := NewMap()
 	m.Set("1", 1)
 	m.Set("2", 2)
@@ -22,7 +19,6 @@ func TestSetElems(t *testing.T) {
 }
 
 func TestLenElems(t *testing.T) {
-	log.Println("test: TestLenElems")
 	m := NewMap()
 	m.Set("1", 1)
 	m.Set("2", 2)
@@ -33,7 +29,6 @@ func TestLenElems(t *testing.T) {
 }
 
 func TestGetElems(t *testing.T) {
-	log.Println("test: TestGetElems")
 	m := NewMap()
 	m.Set("1", 1)
 	m.Set("2", []string{"1", "2", "3"})
