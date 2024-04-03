@@ -42,7 +42,7 @@ func (b *bucket) increaseLength() {
 	atomic.AddUint32(&b.length, 1)
 }
 
-func (b *bucket) setKV(key *string, value *any) {
+func (b *bucket) setKV(key *string, value *any) bool {
 
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -52,7 +52,9 @@ func (b *bucket) setKV(key *string, value *any) {
 		b.keys[idx] = *key
 		b.increaseLength()
 	}
+
 	b.values[idx] = *value
+	return	isExist
 }
 
 func (b *bucket) getValue(key *string) (any, bool) {

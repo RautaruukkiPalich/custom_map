@@ -44,8 +44,8 @@ func (m *customMap) getBucketByHash(hashedKey uint32) *bucket {
 	return b
 }
 
-func (m *customMap) setValueToBucket(key *string, value *any, b *bucket) {
-	b.setKV(key, value)
+func (m *customMap) setValueToBucket(key *string, value *any, b *bucket) bool {
+	return b.setKV(key, value)
 }
 
 func (m *customMap) getValueFromBucket(key *string, b *bucket) (any, bool) {

@@ -52,12 +52,10 @@ func (m *customMap) Set(key string, value any) {
 	defer m.lock.Unlock()
 	
 	b := m.getBucketByHash(hashedKey)
-	_, ok := m.getValueFromBucket(&key, b)
-	if !ok {
+
+	if !m.setValueToBucket(&key, &value, b) {
 		m.incrementMapLength()
 	}
-
-	m.setValueToBucket(&key, &value, b)
 }
 
 func (m *customMap) Get(key string) (any, bool) {
@@ -67,7 +65,7 @@ func (m *customMap) Get(key string) (any, bool) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
-	bucket := m.getBucketByHash(hashedKey)
+	b := m.getBucketByHash(hashedKey)
 
-	return m.getValueFromBucket(&key, bucket)
+	return m.getValueFromBucket(&key, b)
 }
