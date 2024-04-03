@@ -37,4 +37,4 @@ make test
 ```
 make bench
 ```
-![alt bench](https://github.com/rautaruukkipalich/custom_map/blob/main/img/bench.PNG?raw=true)
+![alt bench](https://github.com/rautaruukkipalich/custom_map/blob/main/img/bench.PNG?raw=true =x400)
