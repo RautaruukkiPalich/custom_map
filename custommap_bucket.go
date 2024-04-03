@@ -42,20 +42,20 @@ func (b *bucket) increaseLength() {
 	atomic.AddUint32(&b.length, 1)
 }
 
-func (b *bucket) setKV(key string, value any) {
+func (b *bucket) setKV(key *string, value *any) {
 
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
 	idx, isExist := b.getIndex(key)
 	if !isExist {
-		b.keys[idx] = key
+		b.keys[idx] = *key
 		b.increaseLength()
 	}
-	b.values[idx] = value
+	b.values[idx] = *value
 }
 
-func (b *bucket) getValue(key string) (any, bool) {
+func (b *bucket) getValue(key *string) (any, bool) {
 	idx, isExist := b.getIndex(key)
 	if !isExist {
 		return nil, false
@@ -63,9 +63,9 @@ func (b *bucket) getValue(key string) (any, bool) {
 	return b.values[idx], true
 }
 
-func (b *bucket) getIndex(key string) (uint32, bool) {
+func (b *bucket) getIndex(key *string) (uint32, bool) {
 	for i, bKey := range b.keys {
-		if bKey == key {
+		if bKey == *key {
 			return uint32(i), true
 		}
 	}

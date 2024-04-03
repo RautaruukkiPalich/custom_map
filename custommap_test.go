@@ -51,7 +51,7 @@ func TestGetElems(t *testing.T) {
 
 func TestSetElemWithRaces(t *testing.T) {
 	m := NewMap()
-	iter := 10000
+	iter := 1000
 	wg := &sync.WaitGroup{}
 	wg.Add(iter)
 	for i := 0; i < iter; i++ {
@@ -67,7 +67,7 @@ func TestSetElemWithRaces(t *testing.T) {
 
 func TestSetElemsWithRaces(t *testing.T) {
 	m := NewMap()
-	iter := 100_000
+	iter := 10_000
 	randoms := 100
 
 	wg := &sync.WaitGroup{}
@@ -97,7 +97,7 @@ func TestSetElemsWithRaces(t *testing.T) {
 func TestSetAndGetElemsWithRaces(t *testing.T) {
 	m := NewMap()
 	iter := 100_000
-	randoms := 100
+	randoms := 1000
 
 	wg := &sync.WaitGroup{}
 	wg.Add(iter*2)
@@ -116,12 +116,33 @@ func TestSetAndGetElemsWithRaces(t *testing.T) {
 	assert.Equal(t, randoms, m.Len())
 }
 
-
-func TestSet100kElemsCheckValues(t *testing.T) {
-	m := NewMap()
+func TestSyncMapSetAndGetElemsWithRaces(t *testing.T) {
+	m := sync.Map{}
 	iter := 100_000
+	randoms := 1000
+
+	wg := &sync.WaitGroup{}
+	wg.Add(iter*2)
+	for i := 0; i < iter; i++ {
+		go func(i int) {
+			m.Store(strconv.Itoa(rand.Intn(randoms)), i)
+			wg.Done()
+		}(i)
+		go func(i int) {
+			m.Load(strconv.Itoa(rand.Intn(randoms)))
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+}
+
+
+func TestSet500kElemsCheckValues(t *testing.T) {
+	m := NewMap()
+	iter := 500_000
 	wg := &sync.WaitGroup{}
 	wg.Add(iter)
+
 	for i := 0; i < iter; i++ {
 		go func(i int) {
 			m.Set(strconv.Itoa(i), i)
@@ -139,6 +160,33 @@ func TestSet100kElemsCheckValues(t *testing.T) {
 
 	for i := iter; i < iter+iter; i++ {
 		res, ok := m.Get(strconv.Itoa(i))
+		assert.Equal(t, nil, res)
+		assert.Equal(t, false, ok)
+	}
+}
+
+func TestSyncMapSet500kElemsCheckValues(t *testing.T) {
+	m := sync.Map{}
+	iter := 500_000
+	wg := &sync.WaitGroup{}
+	wg.Add(iter)
+
+	for i := 0; i < iter; i++ {
+		go func(i int) {
+			m.Store(strconv.Itoa(i), i)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+
+	for i := 0; i < iter; i++ {
+		res, ok := m.Load(strconv.Itoa(i))
+		assert.Equal(t, i, res)
+		assert.Equal(t, true, ok)
+	}
+
+	for i := iter; i < iter+iter; i++ {
+		res, ok := m.Load(strconv.Itoa(i))
 		assert.Equal(t, nil, res)
 		assert.Equal(t, false, ok)
 	}

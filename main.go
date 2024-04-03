@@ -1,6 +1,8 @@
 package custommap
 
 import (
+	"math"
+	"math/rand"
 	"sync"
 	"sync/atomic"
 )
@@ -13,20 +15,20 @@ type MapInterface interface {
 
 func NewMap() MapInterface {
 
-	log2BucketLength := uint32(2) // number of buckets = 4
+	log2BucketLength := uint32(2) // count buckets = 4
 
 	return &customMap{
 		//header
 		length: 0,
-		salt:   0,
-		lenBuckets: log2BucketLength, //ln2 length of buckets
+		salt:   uint8(rand.Intn(math.MaxUint8) * 2 + 1),
+		lenBuckets: log2BucketLength, //log2 length of buckets
 
 		buckets:    createBuckets(1 << log2BucketLength),
 		oldBuckets: nil,
 	}
 }
 
-// without memory alignment
+// без выравнивания памяти
 type customMap struct {
 	length int32
 	lenBuckets uint32
@@ -44,28 +46,28 @@ func (m *customMap) Len() int {
 
 func (m *customMap) Set(key string, value any) {
 	
-	hashedKey := m.hashKey(key)
+	hashedKey := m.hashKey(&key)
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	
 	b := m.getBucketByHash(hashedKey)
-	_, ok := m.getValueFromBucket(key, b)
+	_, ok := m.getValueFromBucket(&key, b)
 	if !ok {
 		m.incrementMapLength()
 	}
 
-	m.setValueToBucket(key, value, b)
+	m.setValueToBucket(&key, &value, b)
 }
 
 func (m *customMap) Get(key string) (any, bool) {
 	
-	hashedKey := m.hashKey(key)
+	hashedKey := m.hashKey(&key)
 
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
 	bucket := m.getBucketByHash(hashedKey)
 
-	return m.getValueFromBucket(key, bucket)
+	return m.getValueFromBucket(&key, bucket)
 }
