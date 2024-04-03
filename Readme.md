@@ -27,9 +27,9 @@ newMap := custommap.NewMap()
 make test
 ```
 #### без детектора гонок (флага -race)
-![alt test1](https://github.com/rautaruukkipalich/custom_map/img/test_result.png)
+![alt test1](https://github.com/rautaruukkipalich/custom_map/blob/main/img/test_result.png)
 #### c детектором гонок (флагом -race)
-![alt test_race](https://github.com/rautaruukkipalich/custom_map/img/test_result_race.png)
+![alt test_race](https://github.com/rautaruukkipalich/custom_map/blob/main/img/test_result_race.png)
 
 
 ## Бенчмарки
@@ -37,4 +37,4 @@ make test
 ```
 make bench
 ```
-![alt bench](https://github.com/rautaruukkipalich/custom_map/img/bench.png)
+![alt bench](https://github.com/rautaruukkipalich/custom_map/blob/main/img/bench.png)
