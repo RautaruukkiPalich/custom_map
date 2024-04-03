@@ -1,4 +1,4 @@
-package custommap
+package custommap_simple
 
 import (
 	"sync"
@@ -13,11 +13,8 @@ type bucket struct {
 	length  uint
 	keys    [bucketSize]string
 	values  [bucketSize]any
+	extra  *bucket
 	mu      sync.RWMutex
-}
-
-func (b *bucket) increaseLength() {
-	b.length++
 }
 
 func (b *bucket) getLength() uint {
@@ -26,23 +23,36 @@ func (b *bucket) getLength() uint {
 	return b.length
 }
 
-func (b *bucket) setKV(key string, value any) {
+func (b *bucket) getBucketAndIndexByKey(key string) (*bucket, int, bool) {
+	
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+
+	for idx, k := range b.keys {
+		if k == key {
+			return b, idx, true
+		}
+	}
+	if b.extra != nil {
+		return b.extra.getBucketAndIndexByKey(key)
+	}
+	if b.length == bucketSize {
+		return b.extendBucket(), 0, false
+	}
+	return b, int(b.getLength()), false
+}
+
+func (b *bucket) setKV(key string, value any, idx int, isExist bool) {
 
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	for idx, k := range b.keys {
-		if k == key {
-			i := idx
-			b.values[i] = value
-			return 
-		}
-	}
-
 	b.keys[b.length] = key
 	b.values[b.length] = value
 
-	b.increaseLength()
+	if !isExist {
+		b.length++
+	}
 }
 
 func (b *bucket) getValue(key string) (any, bool){
@@ -54,6 +64,13 @@ func (b *bucket) getValue(key string) (any, bool){
 			return b.values[i], true
 		}
 	}
+	if b.extra != nil {
+		return b.extra.getValue(key)
+	}
 	return nil, false
 }
 
+func (b *bucket) extendBucket() *bucket {
+	b.extra = &bucket{}
+	return b.extra
+}

@@ -1,9 +1,10 @@
 simple map
 
-handling collisions
-
-concurrent safety
-
+BUCKET OVERFLOW: связный список
 sync: MUTEX
 
-!!! NOT HANDLED BUCKET OVERFLOW
+низкая производительность
+
+обратотка коллизий
+
+конкурентно безопасная

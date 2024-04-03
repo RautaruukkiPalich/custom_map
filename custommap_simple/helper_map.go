@@ -1,7 +1,6 @@
-package custommap
+package custommap_simple
 
 import (
-	"fmt"
 	"hash/fnv"
 )
 
@@ -53,25 +52,16 @@ func (m *customMap) getBucketByHash(hashedKey uint32) *bucket {
 	if b != nil {
 		return b
 	}
-	return	m.createBucket(hashedKey)
+	return m.createBucket(hashedKey)
 }
 
 func (m *customMap) setValueToBucket(key string, value any, b *bucket) {
-	
-	if b.getLength() >= bucketSize {
-		//TODO: handle this
-		m.evacuateBucket()
-	}
-
-	b.setKV(key, value)
+	b, idx, isExist := b.getBucketAndIndexByKey(key)
+	b.setKV(key, value, idx, isExist)
 }
 
 func (m *customMap) getValueFromBucket(key string, b *bucket) (any, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return b.getValue(key)
-}
-
-func (m *customMap) evacuateBucket() {
-	fmt.Println("evacuate bucket")
 }

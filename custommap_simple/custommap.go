@@ -1,4 +1,4 @@
-package custommap
+package custommap_simple
 
 import (
 	"sync"
@@ -10,7 +10,7 @@ type MapInterface interface {
 	Len() int               // length of map keys
 }
 
-func NewSimpleMap() MapInterface {
+func NewMap() MapInterface {
 	return &customMap{
 		length: 0,
 		// salt:   0,

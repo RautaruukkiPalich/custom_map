@@ -1,6 +1,8 @@
-package custommap
+package custommap_simple
 
 import (
+	"math/rand"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -8,19 +10,19 @@ import (
 )
 
 func TestCreateMap(t *testing.T) {
-	m := NewSimpleMap()
+	m := NewMap()
 	assert.NotNil(t, m)
 }
 
 func TestSetElems(t *testing.T) {
-	m := NewSimpleMap()
+	m := NewMap()
 	m.Set("1", 1)
 	m.Set("2", 2)
 	assert.Equal(t, 2, m.Len())
 }
 
 func TestLenElems(t *testing.T) {
-	m := NewSimpleMap()
+	m := NewMap()
 	m.Set("1", 1)
 	m.Set("2", 2)
 	assert.Equal(t, 2, m.Len())
@@ -30,7 +32,7 @@ func TestLenElems(t *testing.T) {
 }
 
 func TestGetElems(t *testing.T) {
-	m := NewSimpleMap()
+	m := NewMap()
 	m.Set("1", 1)
 	m.Set("2", []string{"1", "2", "3"})
 
@@ -47,17 +49,97 @@ func TestGetElems(t *testing.T) {
 	assert.Equal(t, nil, val)
 }
 
-func TestSetElemsWithRaces(t *testing.T) {
-	m := NewSimpleMap()
-	iter := 100000
+func TestSetElemWithRaces(t *testing.T) {
+	m := NewMap()
+	iter := 10000
 	wg := &sync.WaitGroup{}
 	wg.Add(iter)
 	for i := 0; i < iter; i++ {
-		go func(){
+		go func() {
 			m.Set("1", 2)
 			wg.Done()
 		}()
 	}
 	wg.Wait()
 	assert.Equal(t, 1, m.Len())
+}
+
+
+func TestSet10kElemsWithRaces(t *testing.T) {
+	m := NewMap()
+	iter := 10_000
+	randoms := 100
+
+	wg := &sync.WaitGroup{}
+	wg.Add(iter)
+	for i := 0; i < iter; i++ {
+		go func(i int) {
+			m.Set(strconv.Itoa(rand.Intn(randoms)), i)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+
+	wg.Add(randoms)
+	for i := 0; i < randoms; i++ {
+		go func(i int) {
+			res, _ := m.Get(strconv.Itoa(i))
+			assert.NotNil(t, res)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+
+	assert.Equal(t, randoms, m.Len())
+}
+
+
+func TestSetAndGet10kElemsWithRaces(t *testing.T) {
+	m := NewMap()
+	iter := 10_000
+	randoms := 100
+
+	wg := &sync.WaitGroup{}
+	wg.Add(iter*2)
+	for i := 0; i < iter; i++ {
+		go func(i int) {
+			m.Set(strconv.Itoa(rand.Intn(randoms)), i)
+			wg.Done()
+		}(i)
+		go func(i int) {
+			m.Get(strconv.Itoa(rand.Intn(randoms)))
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+
+	assert.Equal(t, randoms, m.Len())
+}
+
+
+func TestSet10kElemsCheckValues(t *testing.T) {
+	m := NewMap()
+	iter := 10_000
+	wg := &sync.WaitGroup{}
+	wg.Add(iter)
+	for i := 0; i < iter; i++ {
+		go func(i int) {
+			m.Set(strconv.Itoa(i), i)
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+	assert.Equal(t, iter, m.Len())
+
+	for i := 0; i < iter; i++ {
+		res, ok := m.Get(strconv.Itoa(i))
+		assert.Equal(t, i, res)
+		assert.Equal(t, true, ok)
+	}
+
+	for i := iter; i < iter+iter; i++ {
+		res, ok := m.Get(strconv.Itoa(i))
+		assert.Equal(t, nil, res)
+		assert.Equal(t, false, ok)
+	}
 }
