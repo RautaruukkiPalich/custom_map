@@ -1,5 +1,5 @@
 custom map
 
-concurrent: false
-test: false
+concurrent: true
+tests: true
 benchmark: false
