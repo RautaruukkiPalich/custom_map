@@ -5,7 +5,7 @@
 
 ## Установка
 ```sh
-go get github.com/rautaruukkipalich/custom_map
+go get github.com/rautaruukkipalich/custom_map/@latest
 ```
 
 
@@ -17,9 +17,9 @@ newMap := custommap.NewMap()
 ```
 ### Методы
 
-- ```SET(string, any)``` созранение пары ключ/значение в мапу
+- ```SET(string, any)``` добавление пары ключ/значение в мапу
 - ```GET(string) (any, bool)``` получение значения из мапы по ключу
-- ```LEN() int``` получение количества элемнетов мапы
+- ```LEN() int``` получение количества элементов мапы
 
 ## Тестирование
 ### Сравнение с syncMap
