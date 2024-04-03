@@ -5,7 +5,7 @@
 
 ## Установка
 ```sh
-go get github.com/RautaruukkiPalich/custom_map
+go get github.com/rautaruukkipalich/custom_map
 ```
 
 
@@ -27,9 +27,9 @@ newMap := custommap.NewMap()
 make test
 ```
 #### без детектора гонок (флага -race)
-![alt test1](img/test_result.png)
+![alt test1](https://github.com/rautaruukkipalich/custom_map/img/test_result.png)
 #### c детектором гонок (флагом -race)
-![alt test_race](img/test_result_race.png)
+![alt test_race](https://github.com/rautaruukkipalich/custom_map/img/test_result_race.png)
 
 
 ## Бенчмарки
@@ -37,4 +37,4 @@ make test
 ```
 make bench
 ```
-![alt bench](img/bench.png)
+![alt bench](https://github.com/rautaruukkipalich/custom_map/img/bench.png)
