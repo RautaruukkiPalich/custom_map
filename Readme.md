@@ -33,7 +33,7 @@ make test
 
 
 ## Бенчмарки
-Сравнение с syncMap
+### Сравнение с syncMap
 ```
 make bench
 ```
